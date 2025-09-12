@@ -1,74 +1,48 @@
-export interface Teacher {
-  readonly firstName: string;
-  readonly lastName: string;
-  fullTimeEmployee: boolean;
-  yearsOfExperience?: number;
-  location: string;
-  [key: string]: any;
+export interface DirectorInterface {
+  workFromHome(): string;
+  getCoffeeBreak(): string;
+  workDirectorTasks(): string;
 }
 
-export interface Directors extends Teacher {
-  numberOfReports: number;
+export interface TeacherInterface {
+  workFromHome(): string;
+  getCoffeeBreak(): string;
+  workTeacherTasks(): string;
 }
 
-const director1: Directors = {
-  firstName: 'John',
-  lastName: 'Doe',
-  location: 'London',
-  fullTimeEmployee: true,
-  numberOfReports: 17,
-};
-
-console.log(director1);
-
-const teacher3: Teacher = {
-  firstName: 'Jane',
-  lastName: 'Smith',
-  location: 'Paris',
-  fullTimeEmployee: false,
-  contract: true,
-};
-
-console.log(teacher3);
-
-export interface printTeacherFunction {
-  (firstName: string, lastName: string): string;
+export class Director implements DirectorInterface {
+  workFromHome(): string { return 'Working from home'; }
+  getCoffeeBreak(): string { return 'Getting a coffee break'; }
+  workDirectorTasks(): string { return 'Getting to director tasks'; }
 }
 
-export const printTeacher: printTeacherFunction = (firstName, lastName) => {
-  return `${firstName.charAt(0)}. ${lastName}`;
-};
-
-console.log(printTeacher("John", "Doe"));
-
-export interface StudentClassInterface {
-  workOnHomework(): string;
-  displayName(): string;
+export class Teacher implements TeacherInterface {
+  workFromHome(): string { return 'Cannot work from home'; }
+  getCoffeeBreak(): string { return 'Cannot have a break'; }
+  workTeacherTasks(): string { return 'Getting to work'; }
 }
 
-export interface StudentConstructorInterface {
-  new (firstName: string, lastName: string): StudentClassInterface;
-}
-
-export class StudentClass implements StudentClassInterface {
-  private firstName: string;
-  private lastName: string;
-
-  constructor(firstName: string, lastName: string) {
-    this.firstName = firstName;
-    this.lastName = lastName;
+export function createEmployee(salary: number | string): Director | Teacher {
+  if (typeof salary === 'number' && salary < 500) {
+    return new Teacher();
   }
+  return new Director();
+}
 
-  workOnHomework(): string {
-    return 'Currently working';
-  }
+function isDirector(employee: Director | Teacher): employee is Director {
+  return (employee as Director).workDirectorTasks !== undefined;
+}
 
-  displayName(): string {
-    return this.firstName;
+function executeWork(employee: Director | Teacher): string {
+  if (isDirector(employee)) {
+    return employee.workDirectorTasks();
+  } else {
+    return employee.workTeacherTasks();
   }
 }
 
-const StudentMaker: StudentConstructorInterface = StudentClass;
-const student: StudentClassInterface = new StudentMaker('Alice', 'Martin');
-console.log(student.displayName());
-console.log(student.workOnHomework());
+
+console.log(createEmployee(200));
+console.log(createEmployee(1000));
+console.log(createEmployee('$500'));
+console.log(createEmployee(1000));
